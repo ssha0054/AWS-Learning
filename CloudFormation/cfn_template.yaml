@@ -1,0 +1,41 @@
+Description: This template deploys a VPC, with a pair of public and private subnets spread across two Availability Zones. It deploys an Internet Gateway, NAT Gateway, Route Tables,
+  a Security Group, a Load Balancer, a Target Group and an EC2 Instance, which allows public access from the internet to a web app.
+
+# Add parameters
+Parameters:
+  VpcName:
+    Description: Please enter the name of the VPC
+    Type: String
+    Default: vpc-test
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 195.0.0.0/25
+
+# Create a VPC
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsHostnames: 'false'
+      EnableDnsSupport: 'true'
+      Tags:
+        - Key: Name
+          Value: !Ref VpcName
+
+# Create Internet Gateway
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: ig
+
+# Attach Internet Gateway
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
