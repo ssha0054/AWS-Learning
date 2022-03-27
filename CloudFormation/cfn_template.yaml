@@ -231,3 +231,16 @@ Resources:
             echo “Hello World!” > /usr/share/nginx/html/index.html
             sudo systemctl start nginx
             sudo systemctl enable nginx
+  
+  # Create Target Group
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: target-group
+      Port: 80
+      Protocol: HTTP
+      Targets:
+        - Id: !Ref EC2Instance
+          Port: 80
+      TargetType: instance
+      VpcId: !Ref VPC
