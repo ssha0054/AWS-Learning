@@ -12,6 +12,26 @@ Parameters:
     Description: Please enter the IP range (CIDR notation) for this VPC
     Type: String
     Default: 195.0.0.0/25
+  
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the first public subnet
+    Type: String
+    Default: 195.0.0.0/27
+
+  PublicSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the second public subnet
+    Type: String
+    Default: 195.0.0.80/28
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the first private subnet
+    Type: String
+    Default: 195.0.0.32/27
+
+  PrivateSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the second private subnet
+    Type: String
+    Default: 195.0.0.64/28
 
 # Create a VPC
 Resources:
@@ -31,7 +51,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: ig
+          Value: ig-test
 
 # Attach Internet Gateway
   InternetGatewayAttachment:
@@ -39,3 +59,55 @@ Resources:
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    DependsOn: PublicSubnet1
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP.AllocationId
+      ConnectivityType: public
+      SubnetId: !Ref PublicSubnet1
+
+# Create Public Subnets
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: “ap-southeast-2a”
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Pub-Sub-1
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: “ap-southeast-2b”
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Pub-Sub-2
+
+# Create Private Subnets
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: “ap-southeast-2a”
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      Tags:
+        - Key: Name
+          Value: Priv-Sub-1
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: “ap-southeast-2b”
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      Tags:
+        - Key: Name
+          Value: Priv-Sub-2
