@@ -111,3 +111,20 @@ Resources:
       Tags:
         - Key: Name
           Value: Priv-Sub-2
+  
+  # Create Route Tables
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Pub-Route-Table
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Priv-Route-Table
