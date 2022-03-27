@@ -169,3 +169,44 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnet2
+  
+  # Create Security Groups
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Default Security Group for Load Balancer
+      GroupName: load-balancer-sg
+      SecurityGroupEgress:
+        - CidrIp: 195.0.0.0/25
+          ToPort: 80
+          FromPort: 80
+          Description: HTTP
+          IpProtocol: tcp
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          ToPort: 80
+          FromPort: 80
+          Description: HTTP
+          IpProtocol: tcp
+      Tags:
+        - Key: Name
+          Value: load-balancer-sg
+      VpcId: !Ref VPC
+  
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for EC2 Instance
+      GroupName: ec2-instance-sg
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: All traffic
+          IpProtocol: “-1”
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+          Description: All traffic
+          IpProtocol: “-1"
+      Tags:
+        - Key: Name
+          Value: ec2-instance-sg
+      VpcId: !Ref VPC
